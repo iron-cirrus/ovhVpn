@@ -1,0 +1,57 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides: OpenVPN
+# Required-Start:
+# Required-Stop:
+# Should-Start:
+# Should-Stop:
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Start and stop OpenVPN
+# Description: OpenVPN
+### END INIT INFO
+
+fichName="ovhVpn"
+path_to_ovpn_files="/home/android"
+ovpn_file_to_use="oneplus6.ovpn"
+
+# Do NOT change anything below this line unless you know what you are doing!
+
+case "$1" in
+start)
+	echo "Connecting to OpenVPN "
+	cd "$path_to_ovpn_files"
+	exec 1>/var/log/$fichName.service.log 2>&1
+	/usr/sbin/openvpn --config "$ovpn_file_to_use" &
+;;
+install)
+	$0 stop
+	echo installation service
+	cp $0 /etc/init.d
+	update-rc.d "$fichName" defaults
+	service "$fichName" start
+	ps -ef | grep openvpn
+;;
+ 'status')
+#  if mysqld_status check_alive nowarn; then
+#    log_action_msg "$($MYADMIN version)"
+#  else
+    log_action_msg "ovhVPN is stopped."
+    exit 0
+#  fi
+  ;;
+
+stop)
+echo "Closing connection to OpenVPN "
+exec 1>/var/log/"$fichName".service.log 2>&1
+
+killall openvpn
+;;
+*)
+echo "Usage: /etc/init.d/vpn {start|stop}"
+exit 1
+;;
+esac
+
+exit 0
